@@ -48,3 +48,10 @@ mariadb_setup() {
 
     echo "Database 'pterodactyl' and user 'panel' created with password $password"
 }
+pterodactyl_download(){
+    mkdir -p /var/www/pterodactyl
+    cd /var/www/pterodactyl
+    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v0.7.9/panel.tar.gz
+    tar --strip-components=1 -xzvf panel.tar.gz
+    chmod -R 755 storage/* bootstrap/cache/
+}
