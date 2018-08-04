@@ -7,7 +7,7 @@ server_setup() {
 }
 
 initial() {
-    echo "Updating your server!"
+    echo "Updating & Cleaning your server!"
     apt -y update 
     apt -y upgrade
     apt -y autoremove
@@ -39,8 +39,8 @@ install_mariadb() {
 mariadb_setup() {
     echo "Setting up your database."
     password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`  
-    Q1="CREATE DATABASE IF NOT EXISTS pterodactyl;"
-    Q2="GRANT ALL ON *.* TO 'panel'@'127.0.0.1' IDENTIFIED BY '$password';"
+    Q1="CREATE DATABASE IF NOT EXISTS panel;"
+    Q2="GRANT ALL ON *.* TO 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$password';"
     Q3="FLUSH PRIVILEGES;"
     SQL="${Q1}${Q2}${Q3}"
     
