@@ -1,3 +1,3 @@
 # Pterodactyl
 
-Automatic Installation Script - Beta
+Automatic Installation Script - I am still working on it
