@@ -20,9 +20,12 @@ install_dependencies(){
     apt -y install software-properties-common
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
+    sudo add-apt-repository ppa:certbot/certbot
     apt -y update
     apt -y upgrade
-    apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip nginx curl tar unzip git redis-server
+    apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip nginx curl tar unzip git redis-server certbot
+    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+    echo "Dependencies successfully installed"
 }
 
 install_mariadb() {
@@ -49,9 +52,28 @@ mariadb_setup() {
     echo "Database 'pterodactyl' and user 'panel' created with password $password"
 }
 pterodactyl_download(){
+    echo "Downloading Pterodactyl"
     mkdir -p /var/www/pterodactyl
     cd /var/www/pterodactyl
     curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v0.7.9/panel.tar.gz
     tar --strip-components=1 -xzvf panel.tar.gz
     chmod -R 755 storage/* bootstrap/cache/
+    echo "Pterodactyl successfully downloaded"
 }
+pterodactyl_install(){
+    echo "Environment & User setup"
+    cp .env.example .env
+    composer install --no-dev --optimize-autoloader
+    php artisan key:generate --force
+    php artisan p:environment:setup
+    php artisan p:environment:database
+    php artisan p:environment:mail
+    php artisan migrate --seed
+    php artisan p:user:make
+    chown -R www-data:www-data * 
+}
+temp_dev{
+    echo "Check the docs for webserver configurations"
+}
+
+
