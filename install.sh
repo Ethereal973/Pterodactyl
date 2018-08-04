@@ -12,6 +12,7 @@ initial() {
     apt -y upgrade
     apt -y autoremove
     apt -y autoclean
+    apt -y install curl
 }
 
 install_dependencies(){
@@ -33,4 +34,17 @@ install_mariadb() {
     export DEBIAN_FRONTEND="noninteractive"
     sudo aptitude -y install mariadb-server
     echo "root password is $rootpasswd"
+}
+
+mariadb_setup() {
+    echo "Setting up your database."
+    password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`  
+    Q1="CREATE DATABASE IF NOT EXISTS pterodactyl;"
+    Q2="GRANT ALL ON *.* TO 'panel'@'127.0.0.1' IDENTIFIED BY '$password';"
+    Q3="FLUSH PRIVILEGES;"
+    SQL="${Q1}${Q2}${Q3}"
+    
+    sudo mysql -u root -p="" -e "$SQL"
+
+    echo "Database 'pterodactyl' and user 'panel' created with password $password"
 }
