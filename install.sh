@@ -25,6 +25,9 @@ install_dependencies(){
 
 install_mariadb() {
     echo "Installing Mariadb Server."
+    apt-get install software-properties-common
+    apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+    add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/ubuntu bionic main'
     rootpasswd=$(openssl rand -base64 12)
     export DEBIAN_FRONTEND="noninteractive"
     sudo aptitude -y install mariadb-server
