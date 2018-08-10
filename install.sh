@@ -2,7 +2,11 @@
 
 server_setup() {
     clear
-    output "Hope you enjoy this install script created by Ethereal at https://thientran.io. Please enter the information below. "
+    output "Thank you for your purchase. Please enter the information below. "
+    read -p "Enter admin email (e.g. admin@example.com) : " EMAIL
+    read -p "Enter servername (e.g. portal.example.com) : " SERVNAME
+    read -p "Enter time zone (e.g. America/New_York) : " TIME
+    read -p "Portal password : " PORTALPASS
 }
 
 initial() {
@@ -83,16 +87,21 @@ pterodactyl() {
      
 
    output "Creating config files"
-sudo bash -c 'cat > /etc/supervisor/conf.d/pterodactyl-worker.conf' <<-'EOF'
-[program:pterodactyl-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/pterodactyl/html/artisan queue:work database --queue=high,standard,low --sleep=3 --tries=3
-autostart=true
-autorestart=true
-user=www-data
-numprocs=2
-redirect_stderr=true
-stdout_logfile=/var/www/pterodactyl/html/storage/logs/queue-worker.log
+sudo bash -c 'cat > /etc/systemd/system/pteroq.service' <<-'EOF'
+[Unit]
+Description=Pterodactyl Queue Worker
+After=redis-server.service
+
+[Service]
+# On some systems the user and group might be different.
+# Some systems use `apache` as the user and group.
+User=www-data
+Group=www-data
+Restart=always
+ExecStart=/usr/bin/php /var/www/pterodactyl/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3
+
+[Install]
+WantedBy=multi-user.target
 EOF
     output "Updating Supervisor"
     sudo supervisorctl reread
