@@ -54,7 +54,7 @@ webserver_options {
   esac
 }
     
-function required_vars_panel {
+required_vars_panel {
     output "Please enter your FQDN:"
     read FQDN
 
@@ -77,7 +77,7 @@ function required_vars_panel {
     read userpassword
 }
 
-function required_vars_daemon {
+required_vars_daemon {
   output "Please enter your FQDN"
   read FQDN
 }
