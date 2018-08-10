@@ -6,9 +6,9 @@ server_setup() {
     clear
     output "Hope you enjoy this install script created by http://www.my4x4.club. Please enter the information below. "
     read -p "Enter admin email (e.g. admin@example.com) : " EMAIL
-    read -p "Enter servername (e.g. portal.example.com) : " SERVNAME
+    read -p "Enter servername (e.g. panel.example.com) : " SERVNAME
     read -p "Enter time zone (e.g. America/New_York) : " TIME
-    read -p "Portal password : " PORTALPASS
+    read -p "Panel password : " PANELPASS
 }
 
 initial() {
@@ -116,7 +116,7 @@ pterodactyl_1() {
      output "Seeding the database"
      php artisan db:seed --force
      output "Create First User"
-     php artisan pterodactyl:user --email="$EMAIL" --password=$PORTALPASS --admin=1
+     php artisan pterodactyl:user --email="$EMAIL" --password=$PANELPASS --admin=1
      sudo service cron restart
      sudo service supervisor start
      
