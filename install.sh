@@ -1,8 +1,49 @@
 #!/bin/bash
 
-server_setup() {
-    clear
-    output "Thank you for your purchase. Please enter the information below. "
+server_os() {
+    output "Thank you for your purchase. Please note that this script is meant to be installed on a fresh OS. Installing it on a non-fresh OS may cause problems."
+    output "Please select the current OS version:\n[1] Ubuntu 18.04 LTS.\n[2] Ubuntu 16.04 LTS\n[3] Debian 9.\n[4] Debian 8."
+    read os
+    case $os in
+        1 ) osoption=1
+            output "Ubuntu 18.04 LTS selected."
+            ;;
+        2 ) osoption=2
+            output "Ubuntu 16.04 LTS selected."
+            ;;
+        3 ) installoption=3
+            output "Debian 9 selected."
+            ;;
+        4 ) installoption=4
+            output "Debian 8 selected."
+            ;;
+        * ) output "You did not enter a a valid selection"
+            server_os
+    esac
+    
+server_options() {
+    output "Please select what you would like to install:\n[1] Install the panel.\n[2] Install the daemon.\n[3] Install the panel and daemon."
+    read choice
+    case $choice in
+        1 ) installoption=1
+            output "You have selected panel installation only."
+            ;;
+        2 ) installoption=2
+            output "You have selected daemon installation only."
+            ;;
+        3 ) installoption=3
+            output "You have selected panel and daemon installation."
+            ;;
+        * ) output "You did not enter a a valid selection"
+            server_options
+    esac
+}   
+    
+    
+    
+    
+    
+    output "Please enter the information below to start the installation process." 
     read -p "Enter admin email (e.g. admin@example.com) : " EMAIL
     read -p "Enter servername (e.g. portal.example.com) : " SERVNAME
     read -p "Enter time zone (e.g. America/New_York) : " TIME
