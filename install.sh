@@ -259,11 +259,7 @@ pterodactyl_daemon() {
     tar --strip-components=1 -xzvf v0.3.7.tar.gz
     npm install --only=production
 
-    output "This step requires you to create your first node through your panel, only continue after you get your core code"
-    output "Paste the code in the file and then hit CTRL + o then CTRL + x."
-    read -p "Press enter to continue" nothing
-    sudo nano /srv/daemon/config/core.json
-sudo bash -c 'cat > /etc/systemd/system/wings.service' <<-EOF
+sudo bash -c 'cat > /etc/systemd/system/wings.service' <<-'EOF'
 [Unit]
 Description=Pterodactyl Wings Daemon
 After=docker.service
@@ -284,7 +280,6 @@ EOF
 
       sudo systemctl daemon-reload
       sudo systemctl enable wings
-      sudo systemctl start wings
 
 # Process command line...
 server_setup
