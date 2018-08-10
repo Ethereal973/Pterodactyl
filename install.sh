@@ -36,6 +36,11 @@ server() {
     sudo apt-get -y install libssl-dev
 }
 
+server_extra() {
+    output "Adding repositories and PPAs"
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+    add-apt-repository -y ppa:chris-lea/redis-server
+
 install_nginx() {
     output "Installing Nginx server."
     sudo aptitude -y install nginx
