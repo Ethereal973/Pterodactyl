@@ -3,18 +3,18 @@
 server_os() {
     output "Thank you for your purchase. Please note that this script is meant to be installed on a fresh OS. Installing it on a non-fresh OS may cause problems."
     output "Please select the current OS version:\n[1] Ubuntu 18.04 LTS.\n[2] Ubuntu 16.04 LTS\n[3] Debian 9.\n[4] Debian 8."
-    read os
-    case $os in
+    read choice
+    case $choice in
         1 ) osoption=1
             output "Ubuntu 18.04 LTS selected."
             ;;
         2 ) osoption=2
             output "Ubuntu 16.04 LTS selected."
             ;;
-        3 ) installoption=3
+        3 ) osoption=3
             output "Debian 9 selected."
             ;;
-        4 ) installoption=4
+        4 ) option=4
             output "Debian 8 selected."
             ;;
         * ) output "You did not enter a a valid selection"
@@ -39,15 +39,47 @@ server_options() {
     esac
 }   
     
+webserver_options {
+  output "Please select which web server you would like to use:\n[1] Nginx (Recommended).\n[2] Apache."
+  read choice
+  case $choice in
+      1 ) webserver=1
+          output "You have selected Nginx."
+          ;;
+      2 ) webserver=2
+          output "You have selected Apache."
+          ;;
+      * ) output "You did not enter a a valid selection"
+          webserver_options
+  esac
+}
     
-    
-    
-    
-    output "Please enter the information below to start the installation process." 
-    read -p "Enter admin email (e.g. admin@example.com) : " EMAIL
-    read -p "Enter servername (e.g. portal.example.com) : " SERVNAME
-    read -p "Enter time zone (e.g. America/New_York) : " TIME
-    read -p "Portal password : " PANELPASS
+function required_vars_panel {
+    output "Please enter your FQDN:"
+    read FQDN
+
+    output "Please enter your timezone in PHP format:"
+    read timezone
+
+    output "Please enter your desired first name:"
+    read firstname
+
+    output "Please enter your desired last name:"
+    read lastname
+
+    output "Please enter your desired username:"
+    read username
+
+    output "Please enter the desired user email address:"
+    read email
+
+    output "Please enter the desired password:"
+    read userpassword
+}
+
+function required_vars_daemon {
+  output "Please enter your FQDN"
+  read FQDN
 }
 
 initial() {
