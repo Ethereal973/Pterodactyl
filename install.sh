@@ -4,7 +4,7 @@ clear
 
 server_setup() {
     clear
-    output "Hope you enjoy this install script created by http://www.my4x4.club. Please enter the information below. "
+    output "Hope you enjoy this install script created by https://thientran.io. Please enter the information below. "
     read -p "Enter admin email (e.g. admin@example.com) : " EMAIL
     read -p "Enter servername (e.g. panel.example.com) : " SERVNAME
     read -p "Enter time zone (e.g. America/New_York) : " TIME
