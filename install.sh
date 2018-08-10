@@ -77,9 +77,9 @@ install_timezone() {
 pterodactyl() {
     output "Install Pterodactyl-Panel."
     # Installing the Panel
-    cd /var/www/pterodactyl/html
-    curl -Lo v0.5.7.tar.gz https://github.com/Pterodactyl/Panel/archive/v0.5.7.tar.gz
-    tar --strip-components=1 -xzvf v0.5.7.tar.gz
+    cd /var/www/pterodactyl
+    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v0.7.9/panel.tar.gz
+    tar --strip-components=1 -xzvf panel.tar.gz
     sudo chmod -R 777 storage/* bootstrap/cache
     curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
     composer setup
