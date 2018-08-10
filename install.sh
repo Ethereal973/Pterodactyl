@@ -1,7 +1,5 @@
 #!/bin/bash
 
-clear
-
 server_setup() {
     clear
     output "Hope you enjoy this install script created by Ethereal at https://thientran.io. Please enter the information below. "
