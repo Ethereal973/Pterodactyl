@@ -6,7 +6,7 @@ server_setup() {
     read -p "Enter admin email (e.g. admin@example.com) : " EMAIL
     read -p "Enter servername (e.g. portal.example.com) : " SERVNAME
     read -p "Enter time zone (e.g. America/New_York) : " TIME
-    read -p "Portal password : " PORTALPASS
+    read -p "Portal password : " PANELPASS
 }
 
 initial() {
@@ -110,70 +110,19 @@ EOF
     sudo systemctl enable supervisor.service
 }
 
-pterodactyl_niginx() {
+pterodactyl_nginx() {
     output "Creating webserver initial config file"
-echo '
-    server {
-        listen 80;
-        listen [::]:80;
-        server_name '"${SERVNAME}"';
-    
-        root "/var/www/pterodactyl/html/public";
-        index index.html index.htm index.php;
-        charset utf-8;
-    
-        location / {
-            try_files $uri $uri/ /index.php?$query_string;
-        }
-    
-        location = /favicon.ico { access_log off; log_not_found off; }
-        location = /robots.txt  { access_log off; log_not_found off; }
-    
-        access_log off;
-        error_log  /var/log/nginx/pterodactyl.app-error.log error;
-    
-        # allow larger file uploads and longer script runtimes
-            client_max_body_size 100m;
-        client_body_timeout 120s;
-    
-        sendfile off;
-    
-        location ~ \.php$ {
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
-            fastcgi_index index.php;
-            include fastcgi_params;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            fastcgi_intercept_errors off;
-            fastcgi_buffer_size 16k;
-            fastcgi_buffers 4 16k;
-            fastcgi_connect_timeout 300;
-            fastcgi_send_timeout 300;
-            fastcgi_read_timeout 300;
-        }
-    
-        location ~ /\.ht {
-            deny all;
-        }
-        location ~ /.well-known {
-            allow all;
-        }
-    }
-' | sudo -E tee /etc/nginx/sites-available/pterodactyl.conf >/dev/null 2>&1
 
     sudo ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/pterodactyl.conf
     output "Install LetsEncrypt and setting SSL"
-    sudo service nginx restart
-    sudo aptitude -y install letsencrypt
-    sudo letsencrypt certonly -a webroot --webroot-path=/var/www/pterodactyl/html/public --email "$EMAIL" --agree-tos -d "$SERVNAME"
-    sudo rm /etc/nginx/sites-available/pterodactyl.conf
-    sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+    sudo service nginx stop
+    sudo apt -y install certbot
+    sudo certbot certonly --email "$EMAIL" --agree-tos -d "$SERVNAME"
     echo '
         server {
             listen 80;
             listen [::]:80;
             server_name '"${SERVNAME}"';
-            # enforce https
             return 301 https://$server_name$request_uri;
         }
         
@@ -240,23 +189,20 @@ echo '
 
 pterodactyl_daemon() {
     output "Installing the daemon now! Almost done!!"
-    sudo aptitude -y install linux-image-extra-$(uname -r) linux-image-extra-virtual
-    sudo aptitude update -y
-    sudo aptitude upgrade -y
+    sudo apt-get update -y
+    sudo apt-get upgrade -y
     curl -sSL https://get.docker.com/ | sh
-    sudo usermod -aG docker $whoami
     sudo systemctl enable docker
     output "Installing Nodejs"
-    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     sudo aptitude -y install nodejs
     output "Making sure we didnt miss any dependencies "
     sudo aptitude -y install tar unzip make gcc g++ python-minimal
     output "Ok really installing the daemon files now"
     sudo mkdir -p /srv/daemon /srv/daemon-data
-    sudo chown -R $whoami:$whoami /srv/daemon
     cd /srv/daemon
-    curl -Lo v0.3.7.tar.gz https://github.com/Pterodactyl/Daemon/archive/v0.3.7.tar.gz
-    tar --strip-components=1 -xzvf v0.3.7.tar.gz
+    curl -L https://github.com/pterodactyl/daemon/releases/download/v0.6.3/daemon.tar.gz
+    tar --strip-components=1 -xzv
     npm install --only=production
 
 sudo bash -c 'cat > /etc/systemd/system/wings.service' <<-'EOF'
