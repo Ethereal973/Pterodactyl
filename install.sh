@@ -18,10 +18,22 @@ initial() {
     sudo apt-get -y upgrade
     sudo apt-get -y autoremove
     sudo apt-get -y autoclean
-    output "Switching to Aptitude"
-    sudo apt-get -y install aptitude
-    sudo aptitude update -y
-    whoami=`whoami`
+}
+
+server() {
+    output "Installing Server Packages."
+    # installing more server files
+    sudo apt-get -y install curl
+    sudo apt-get -y install tar
+    sudo apt-get -y install unzip
+    sudo apt-get -y install git
+    sudo apt-get -y install python-pip
+    sudo apt-get -y install supervisor
+    sudo apt-get -y install make
+    sudo apt-get -y install g++
+    sudo apt-get -y install python-minimal
+    sudo apt-get -y install gcc
+    sudo apt-get -y install libssl-dev
 }
 
 install_nginx() {
@@ -40,7 +52,7 @@ install_mariadb() {
     
     # adding user to group, creating dir structure, setting permissions
     sudo mkdir -p /var/www/pterodactyl
-    sudo chown -R $whoami:$whoami /var/www/pterodactyl
+    sudo chown -R www-data:www-data *  /var/www/pterodactyl
     sudo chmod -R 775 /var/www/pterodactyl
 }
 
@@ -60,23 +72,6 @@ install_timezone() {
     sudo ntpdate time.stdtime.gov.tw
     # write time to clock.
     sudo hwclock -w
-}
-
-server() {
-    output "Installing Server Packages."
-    # installing more server files
-    sudo aptitude -y install curl
-    sudo aptitude -y install tar
-    sudo aptitude -y install unzip
-    sudo aptitude -y install git
-    sudo aptitude -y install python-pip
-    pip install --upgrade pip
-    sudo aptitude -y install supervisor
-    sudo aptitude -y install make
-    sudo aptitude -y install g++
-    sudo aptitude -y install python-minimal
-    sudo aptitude -y install gcc
-    sudo aptitude -y install libssl-dev
 }
 
 pterodactyl() {
