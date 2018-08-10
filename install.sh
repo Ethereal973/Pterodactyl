@@ -83,7 +83,7 @@ required_vars_daemon {
 }
 
 initial() {
-    output "Updating all packages"
+    output "Updating all server packages"
     # update package and upgrade Ubuntu
     sudo apt-get -y update 
     sudo apt-get -y upgrade
@@ -91,13 +91,35 @@ initial() {
     sudo apt-get -y autoclean
 }
 
-server() {
+server_u18() {
     output "Adding repositories and PPAs"
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
     sudo apt-get -y install software-properties-common
     sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
     sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/ubuntu bionic main'
+    sudo add-apt-repository -y ppa:certbot/certbot
+}
+
+server_u16() {
+    output "Adding repositories and PPAs"
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+    add-apt-repository -y ppa:chris-lea/redis-server
+    sudo apt-get -y install software-properties-common
+    sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+    sudo add-apt-repository 'deb [arch=amd64,arm64,i386,ppc64el] https://mirrors.shu.edu.cn/mariadb/repo/10.3/ubuntu xenial main'
+    sudo add-apt-repository -y ppa:certbot/certbot
+}
+
+server_d9() {
+    output "Adding repositories and PPAs"
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+    add-apt-repository -y ppa:chris-lea/redis-server
+    sudo apt-get install software-properties-common dirmngr
+    sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xF1656F24C74CD1D8
+    sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/debian stretch main'
+    sudo add-apt-repository -y ppa:certbot/certbot
+}
 
 install_nginx() {
     output "Installing Nginx server."
@@ -185,8 +207,6 @@ pterodactyl_nginx() {
 
     output "Install LetsEncrypt and setting SSL"
     sudo service nginx stop
-    sudo add-apt-repository -y ppa:certbot/certbot
-    sudo apt-get -y install certbot
     sudo certbot certonly --email "$EMAIL" --agree-tos -d "$SERVNAME"
     echo '
         server {
