@@ -61,12 +61,11 @@ install_mariadb() {
     # adding user to group, creating dir structure, setting permissions
     sudo mkdir -p /var/www/pterodactyl
     sudo chown -R www-data:www-data *  /var/www/pterodactyl
-    sudo chmod -R 775 /var/www/pterodactyl
 }
 
 install_dependencies() {
     output "Installing PHP and Dependencies."
-    sudo aptitude -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-common php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl
+    apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip tar unzip git redis-server
 }
 
 pterodactyl() {
