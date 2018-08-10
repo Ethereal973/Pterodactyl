@@ -19,22 +19,6 @@ initial() {
 }
 
 server() {
-    output "Installing Server Packages."
-    # installing more server files
-    sudo apt-get -y install curl
-    sudo apt-get -y install tar
-    sudo apt-get -y install unzip
-    sudo apt-get -y install git
-    sudo apt-get -y install python-pip
-    sudo apt-get -y install supervisor
-    sudo apt-get -y install make
-    sudo apt-get -y install g++
-    sudo apt-get -y install python-minimal
-    sudo apt-get -y install gcc
-    sudo apt-get -y install libssl-dev
-}
-
-server_extra() {
     output "Adding repositories and PPAs"
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
