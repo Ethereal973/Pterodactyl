@@ -202,7 +202,7 @@ echo '
             listen [::]:443 ssl http2;
             server_name '"${SERVNAME}"';
         
-            root /var/www/pterodactyl/html/public;
+            root /var/www/pterodactyl/public;
             index index.php;
         
             access_log /var/log/nginx/pterodactyl.app-accress.log;
@@ -236,7 +236,7 @@ echo '
         
             location ~ \.php$ {
                 fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
