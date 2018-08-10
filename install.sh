@@ -48,7 +48,7 @@ create_directory(){
 
 install_dependencies() {
     output "Installing PHP and Dependencies."
-    apt -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip curl tar unzip git redis-server
+    apt-get -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip curl tar unzip git redis-server
 }
 
 pterodactyl() {
@@ -113,7 +113,7 @@ pterodactyl_nginx() {
     output "Install LetsEncrypt and setting SSL"
     sudo service nginx stop
     sudo add-apt-repository -y ppa:certbot/certbot
-    sudo apt -y install certbot
+    sudo apt-get -y install certbot
     sudo certbot certonly --email "$EMAIL" --agree-tos -d "$SERVNAME"
     echo '
         server {
@@ -193,9 +193,9 @@ pterodactyl_daemon() {
     sudo systemctl enable docker
     output "Installing Nodejs"
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-    sudo aptitude -y install nodejs
+    sudo apt-get -y install nodejs
     output "Making sure we didnt miss any dependencies "
-    sudo aptitude -y install tar unzip make gcc g++ python-minimal
+    sudo apt-get -y install tar unzip make gcc g++ python-minimal
     output "Ok really installing the daemon files now"
     sudo mkdir -p /srv/daemon /srv/daemon-data
     cd /srv/daemon
