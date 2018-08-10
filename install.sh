@@ -3,10 +3,6 @@
 server_setup() {
     clear
     output "Hope you enjoy this install script created by Ethereal at https://thientran.io. Please enter the information below. "
-    read -p "Enter admin email (e.g. admin@example.com) : " EMAIL
-    read -p "Enter servername (e.g. panel.example.com) : " SERVNAME
-    read -p "Enter time zone (e.g. America/New_York) : " TIME
-    read -p "Panel password : " PANELPASS
 }
 
 initial() {
@@ -28,7 +24,7 @@ server() {
 
 install_nginx() {
     output "Installing Nginx server."
-    sudo aptitude -y install nginx
+    sudo apt-get -y install nginx
     sudo service nginx start
     sudo service cron start
 }
@@ -38,8 +34,10 @@ install_mariadb() {
     # create random password
     rootpasswd=$(openssl rand -base64 12)
     export DEBIAN_FRONTEND="noninteractive"
-    sudo aptitude -y install mariadb-server
-    
+    sudo apt-get -y install mariadb-server
+}
+
+create_directory(){
     # adding user to group, creating dir structure, setting permissions
     sudo mkdir -p /var/www/pterodactyl
     sudo chown -R www-data:www-data *  /var/www/pterodactyl
@@ -56,35 +54,32 @@ pterodactyl() {
     cd /var/www/pterodactyl
     curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v0.7.9/panel.tar.gz
     tar --strip-components=1 -xzvf panel.tar.gz
-    sudo chmod -R 777 storage/* bootstrap/cache
+    chmod -R 755 storage/* bootstrap/cache/
     curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-    composer setup
-    # create mysql structure
-    # create database
+    output "Environment Setup"
+    cp .env.example .env
+    composer install --no-dev --optimize-autoloader
+    php artisan key:generate --force
+    output "Unless you are using a remote caching server, hit Enter to use the default settings for redis host, port and password."
+    php artisan p:environment:setup
+    output "Database setup"
     password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`  
-    Q1="CREATE DATABASE IF NOT EXISTS pterodactyl;"
-    Q2="GRANT ALL ON *.* TO 'panel'@'localhost' IDENTIFIED BY '$password';"
+    Q1="CREATE DATABASE IF NOT EXISTS panel;"
+    Q2="GRANT ALL ON *.* TO 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$password';"
     Q3="FLUSH PRIVILEGES;"
     SQL="${Q1}${Q2}${Q3}"
     
     sudo mysql -u root -p="" -e "$SQL"
 
-    output "Database 'pterodactyl' and user 'panel' created with password $password"
-}
-pterodactyl_1() {
-     clear
-     output "Environment Setup"
-     php artisan pterodactyl:env --dbhost=localhost --dbport=3306 --dbname=pterodactyl --dbuser=panel --dbpass=$password --url=http://$SERVNAME --timezone=$TIME
-     output "Mail Setup"
-     # php artisan pterodactyl:mail 
-     output "Database Setup"
-     php artisan migrate --force
-     output "Seeding the database"
-     php artisan db:seed --force
-     output "Create First User"
-     php artisan pterodactyl:user --email="$EMAIL" --password=$PANELPASS --admin=1
-     sudo service cron restart
-     sudo service supervisor start
+    output "Database 'panel' and user 'pterodactyl' created with password $password ."
+    
+    php artisan p:environment:database 
+    output "Mail Setup"
+    php artisan p:environment:mail
+    output "Database Setup"
+    php artisan migrate --seed
+    output "Create First User"
+    php artisan p:user:make --email="$EMAIL" --password=$PANELPASS --admin=y
      
 
    output "Creating config files"
