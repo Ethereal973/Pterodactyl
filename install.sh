@@ -285,30 +285,6 @@ EOF
       sudo systemctl daemon-reload
       sudo systemctl enable wings
       sudo systemctl start wings
-      sudo service wings start
-
-      sudo usermod -aG www-data $whoami
-      sudo chown -R www-data:www-data /var/www/pterodactyl/html
-      sudo chown -R www-data:www-data /srv/daemon
-      sudo chmod -R 775 /var/www/pterodactyl/html
-      sudo chmod -R 775 /srv/daemon
-      echo '
-[client]
-user=root
-password='"${rootpasswd}"'
-[mysql]
-user=root
-password='"${rootpasswd}"'
-' | sudo -E tee ~/.my.cnf >/dev/null 2>&1
-      sudo chmod 0600 ~/.my.cnf
-      output "Setting mysql root password"
-      sudo mysqladmin -u root password $rootpasswd    
-      (crontab -l ; echo "* * * * * php /var/www/pterodactyl/html/artisan schedule:run >> /dev/null 2>&1")| crontab -
-      
-      output "Please reboot your server to apply new permissions"
-    
-    
-}
 
 # Process command line...
 server_setup
