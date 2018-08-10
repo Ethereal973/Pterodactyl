@@ -1,23 +1,7 @@
 #!/bin/bash
 
 clear
-# get sever os name: ubuntu or centos
-server_name=`lsb_release -ds | awk -F ' ' '{printf $1}' | tr A-Z a-z`
-version_name=`lsb_release -cs`
 
-output() {
-    printf "\E[0;33;40m"
-    echo $1
-    printf "\E[0m"
-}
-
-displayErr() {
-    echo
-    echo $1;
-    echo
-    exit 1;
-}
-    # get user input
 server_setup() {
     clear
     output "Hope you enjoy this install script created by http://www.my4x4.club. Please enter the information below. "
