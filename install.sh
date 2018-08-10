@@ -49,11 +49,6 @@ install_dependencies() {
     sudo aptitude -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-common php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl
 }
 
-install_dependencies_apache() {
-    output "Installing PHP and Dependencies."
-    sudo aptitude -y install php7.0 php7.0-cli php7.0-gd php7.0-mysql php7.0-common php7.0-mbstring php7.0-tokenizer php7.0-bcmath php7.0-xml php7.0-fpm php7.0-curl libapache2-mod-php
-}
-
 install_timezone() {
     output "Update default timezone."
     output "Thanks for using this installation script. Donations welcome PayPal:support@my4x4.club"
