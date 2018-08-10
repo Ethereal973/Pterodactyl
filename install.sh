@@ -30,7 +30,6 @@ install_nginx() {
     output "Installing Nginx server."
     sudo apt-get -y install nginx
     sudo service nginx start
-    sudo service cron start
 }
 
 install_mariadb() {
@@ -103,19 +102,17 @@ ExecStart=/usr/bin/php /var/www/pterodactyl/artisan queue:work --queue=high,stan
 [Install]
 WantedBy=multi-user.target
 EOF
-    output "Updating Supervisor"
-    sudo supervisorctl reread
-    sudo supervisorctl update
-    sudo supervisorctl start pterodactyl-worker:*
-    sudo systemctl enable supervisor.service
+    output "Updating cronjob"
+    crontab -l | { cat; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1"; } | crontab -
+    sudo service cron restart
 }
 
 pterodactyl_nginx() {
     output "Creating webserver initial config file"
 
-    sudo ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/pterodactyl.conf
     output "Install LetsEncrypt and setting SSL"
     sudo service nginx stop
+    sudo add-apt-repository -y ppa:certbot/certbot
     sudo apt -y install certbot
     sudo certbot certonly --email "$EMAIL" --agree-tos -d "$SERVNAME"
     echo '
@@ -183,7 +180,8 @@ pterodactyl_nginx() {
             }
         }
     ' | sudo -E tee /etc/nginx/sites-available/pterodactyl.conf >/dev/null 2>&1    
-
+    
+    sudo ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/pterodactyl.conf
     sudo service nginx restart
 }
 
@@ -226,6 +224,8 @@ EOF
 
       sudo systemctl daemon-reload
       sudo systemctl enable wings
+      
+output "Installation completed. Please check the youtube video on how to configure the daemon."
 
 # Process command line...
 server_setup
