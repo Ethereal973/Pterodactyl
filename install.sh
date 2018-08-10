@@ -4,7 +4,7 @@ clear
 
 server_setup() {
     clear
-    output "Hope you enjoy this install script created by https://thientran.io. Please enter the information below. "
+    output "Hope you enjoy this install script created by Ethereal at https://thientran.io. Please enter the information below. "
     read -p "Enter admin email (e.g. admin@example.com) : " EMAIL
     read -p "Enter servername (e.g. panel.example.com) : " SERVNAME
     read -p "Enter time zone (e.g. America/New_York) : " TIME
@@ -64,19 +64,6 @@ install_mariadb() {
 install_dependencies() {
     output "Installing PHP and Dependencies."
     sudo aptitude -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-common php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl
-}
-
-install_timezone() {
-    output "Update default timezone."
-    output "Thanks for using this installation script. Donations welcome PayPal:support@my4x4.club"
-    # check if link file
-    sudo [ -L /etc/localtime ] &&  sudo unlink /etc/localtime
-    # update time zone
-    sudo ln -sf /usr/share/zoneinfo/$TIME /etc/localtime
-    sudo aptitude -y install ntpdate
-    sudo ntpdate time.stdtime.gov.tw
-    # write time to clock.
-    sudo hwclock -w
 }
 
 pterodactyl() {
