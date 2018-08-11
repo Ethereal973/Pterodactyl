@@ -332,7 +332,6 @@ output "Installation completed. Please check the youtube video on how to configu
 
 
 #Execution
-server_os
 server_options
 
 case $installoption in
