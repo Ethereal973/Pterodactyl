@@ -434,12 +434,13 @@ case $osoption in
                         ssl_certs
                         apache_config
                         ;;
+                    esac
+                    ;;
                  required_vars_daemon
                  ssl_certs
                  pterodactyl_daemon_dependencies 
                  pterodactyl_daemon
                  wings_service
-                 ;;
            ;;
 
     esac           
