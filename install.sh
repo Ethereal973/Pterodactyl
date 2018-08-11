@@ -118,13 +118,15 @@ server_d9() {
     sudo apt-get install software-properties-common dirmngr
     sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xF1656F24C74CD1D8
     sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/debian stretch main'
-    sudo add-apt-repository -y ppa:certbot/certbot
 }
 
-install_nginx() {
-    output "Installing Nginx server."
-    sudo apt-get -y install nginx
-    sudo service nginx start
+server_d8() {
+    output "Adding repositories and PPAs"
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+    add-apt-repository -y ppa:chris-lea/redis-server
+    sudo apt-get install software-properties-common
+    sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
+    sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/debian jessie main'
 }
 
 install_mariadb() {
@@ -143,7 +145,7 @@ create_directory(){
 
 install_dependencies() {
     output "Installing PHP and Dependencies."
-    apt-get -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip curl tar unzip git redis-server
+    apt-get -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip curl tar unzip git redis-server nginx
 }
 
 pterodactyl() {
