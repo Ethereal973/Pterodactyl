@@ -173,6 +173,10 @@ pterodactyl_install() {
 
   mysql -u root -e "$SQL"
 
+
+  output "$password"
+
+
   php artisan p:environment:setup
   php artisan p:environment:database
 
