@@ -372,18 +372,6 @@ EOF
       
 output "Installation completed. Please check the youtube video on how to configure the daemon."
 }
-# Process command line...
-server_setup
-initial
-install_nginx
-install_mariadb
-install_dependencies
-install_timezone
-server
-pterodactyl
-pterodactyl_1
-pterodactyl_niginx
-pterodactyl_daemon
-;;
-esac
-exit 1;
+
+
+case $osoption
