@@ -1,21 +1,7 @@
 #!/bin/bash
-
-server_os() {
-    output "Thank you for your purchase. Please note that this script is meant to be installed on a fresh OS. Installing it on a non-fresh OS may cause problems."
-    output "Please select the current OS version:\n[1] Ubuntu 18.04 LTS.\n[2] Ubuntu 16.04 LTS\n[3] Debian 9.\n[4] Debian 8."
-    read choice
-    case $choice in
-        1 ) osoption=1
-            output "Ubuntu 18.04 LTS selected."
-            ;;
-        2 ) osoption=2
-            output "Ubuntu 16.04 LTS selected."
-            ;;
-        * ) output "You did not enter a a valid selection"
-            server_os
-    esac
     
 server_options() {
+    output "Thank you for your purchase. Please note that this script is meant to be installed on a fresh OS. Installing it on a non-fresh OS may cause problems."
     output "Please select what you would like to install:\n[1] Install the panel.\n[2] Install the daemon.\n[3] Install the panel and daemon."
     read choice
     case $choice in
@@ -92,16 +78,6 @@ server_u18() {
     sudo apt-get -y install software-properties-common
     sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
     sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/ubuntu bionic main'
-    sudo add-apt-repository -y ppa:certbot/certbot
-}
-
-server_u16() {
-    output "Adding repositories and PPAs."
-    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-    add-apt-repository -y ppa:chris-lea/redis-server
-    sudo apt-get -y install software-properties-common
-    sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-    sudo add-apt-repository 'deb [arch=amd64,arm64,i386,ppc64el] https://mirrors.shu.edu.cn/mariadb/repo/10.3/ubuntu xenial main'
     sudo add-apt-repository -y ppa:certbot/certbot
 }
 
@@ -359,65 +335,63 @@ output "Installation completed. Please check the youtube video on how to configu
 server_os
 server_options
 
-case $osoption in
-    1) case $installoption in
-        1)  webserver_options            
-            required_vars_panel
-            initial
-            server_u18
-            install_mariadb
-            case $webserver in
-                1)  install_nginx_dependencies
-                    pterodactyl_download
-                    pterodactyl_install
-                    pterodactyl_queue_listeners
-                    ssl_certs
-                    nginx_config
-                    ;;
-                2)  install_apache_dependencies
-                    pterodactyl_download
-                    pterodactyl_install
-                    pterodactyl_queue_listeners
-                    ssl_certs
-                    apache_config
-                    ;;               
-          esac
-          ;;
-          2)    required_vars_daemon
+case $installoption in
+    1)  webserver_options            
+        required_vars_panel
+        initial
+        server_u18
+        install_mariadb
+        case $webserver in
+            1)  install_nginx_dependencies
+                pterodactyl_download
+                pterodactyl_install
+                pterodactyl_queue_listeners
                 ssl_certs
-                pterodactyl_daemon_dependencies
+                nginx_config
+                ;;
+             2)  install_apache_dependencies
+                pterodactyl_download
+                pterodactyl_install
+                pterodactyl_queue_listeners
+                ssl_certs
+                apache_config
+                ;;               
+        esac
+        ;;
+    2)  required_vars_daemon
+        ssl_certs
+        pterodactyl_daemon_dependencies
+        pterodactyl_daemon
+        wings_service
+        ;;
+     3) webserver_options
+        required_vars_panel
+        initial
+        server_u18
+        install_mariadb
+        case $webserver in
+            1)  install_nginx_dependencies
+                pterodactyl_download
+                pterodactyl_install
+                pterodactyl_queue_listeners
+                ssl_certs
+                nginx_config
+                required_vars_daemon
+                pterodactyl_daemon_dependencies 
                 pterodactyl_daemon
                 wings_service
-          esac
-          ;;
-          3)    webserver_options
-                required_vars_panel
-                initial
-                server_u18
-                install_mariadb
-                case $webserver in
-                    1)  install_nginx_dependencies
-                        pterodactyl_download
-                        pterodactyl_install
-                        pterodactyl_queue_listeners
-                        ssl_certs
-                        nginx_config
-                        required_vars_daemon
-                        pterodactyl_daemon_dependencies 
-                        pterodactyl_daemon
-                        wings_service
-                        ;;
-                    2)  install_apache_dependencies
-                        pterodactyl_download
-                        pterodactyl_install
-                        pterodactyl_queue_listeners
-                        ssl_certs
-                        apache_config
-                        pterodactyl_daemon_dependencies 
-                        pterodactyl_daemon
-                        wings_service
-                        ;;
-                esac
-           ;;
-
-    esac           
+                ;;
+            2)  install_apache_dependencies
+                pterodactyl_download
+                pterodactyl_install
+                pterodactyl_queue_listeners
+                ssl_certs
+                apache_config
+                pterodactyl_daemon_dependencies 
+                pterodactyl_daemon
+                wings_service
+                ;;
+        esac     
+        ;;
+esac
+ 
