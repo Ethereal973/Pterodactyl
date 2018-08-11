@@ -129,15 +129,14 @@ server_d8() {
     sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/debian jessie main'
 }
 
-create_directory(){
-    # adding user to group, creating dir structure, setting permissions
-    sudo mkdir -p /var/www/pterodactyl
-    sudo chown -R www-data:www-data *  /var/www/pterodactyl
+install_nginx_dependencies() {
+    output "Installing Nginx, PHP, and Dependencies."
+    apt-get -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip curl tar unzip git redis-server nginx
 }
 
-install_dependencies() {
-    output "Installing PHP and Dependencies."
-    apt-get -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip curl tar unzip git redis-server nginx
+install_apache_dependencies() {
+    output "Installing Apache, PHP and Dependencies."
+    apt-get -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip curl tar unzip git redis-server apache2
 }
 
 install_mariadb() {
@@ -146,6 +145,15 @@ install_mariadb() {
     rootpasswd=$(openssl rand -base64 12)
     export DEBIAN_FRONTEND="noninteractive"
     sudo apt-get -y install mariadb-server
+}
+
+pterodactyl_download {
+    output "Downloading Pterodactyl"
+    mkdir -p /var/www/pterodactyl
+    cd /var/www/pterodactyl
+    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v0.7.9/panel.tar.gz
+    tar --strip-components=1 -xzvf panel.tar.gz
+    chmod -R 755 storage/* bootstrap/cache/
 }
 
 pterodactyl() {
