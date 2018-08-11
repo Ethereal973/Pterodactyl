@@ -83,7 +83,7 @@ required_vars_daemon {
 }
 
 initial() {
-    output "Updating all server packages"
+    output "Updating all server packages."
     # update package and upgrade Ubuntu
     sudo apt-get -y update 
     sudo apt-get -y upgrade
@@ -92,7 +92,7 @@ initial() {
 }
 
 server_u18() {
-    output "Adding repositories and PPAs"
+    output "Adding repositories and PPAs."
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
     sudo apt-get -y install software-properties-common
@@ -102,7 +102,7 @@ server_u18() {
 }
 
 server_u16() {
-    output "Adding repositories and PPAs"
+    output "Adding repositories and PPAs."
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
     sudo apt-get -y install software-properties-common
@@ -112,7 +112,7 @@ server_u16() {
 }
 
 server_d9() {
-    output "Adding repositories and PPAs"
+    output "Adding repositories and PPAs."
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
     sudo apt-get install software-properties-common dirmngr
@@ -121,20 +121,12 @@ server_d9() {
 }
 
 server_d8() {
-    output "Adding repositories and PPAs"
+    output "Adding repositories and PPAs."
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
     sudo apt-get install software-properties-common
     sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
     sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/debian jessie main'
-}
-
-install_mariadb() {
-    output "Installing Mariadb Server."
-    # create random password
-    rootpasswd=$(openssl rand -base64 12)
-    export DEBIAN_FRONTEND="noninteractive"
-    sudo apt-get -y install mariadb-server
 }
 
 create_directory(){
@@ -146,6 +138,14 @@ create_directory(){
 install_dependencies() {
     output "Installing PHP and Dependencies."
     apt-get -y install php7.2 php7.2-cli php7.2-gd php7.2-mysql php7.2-pdo php7.2-mbstring php7.2-tokenizer php7.2-bcmath php7.2-xml php7.2-fpm php7.2-curl php7.2-zip curl tar unzip git redis-server nginx
+}
+
+install_mariadb() {
+    output "Installing Mariadb Server."
+    # create random password
+    rootpasswd=$(openssl rand -base64 12)
+    export DEBIAN_FRONTEND="noninteractive"
+    sudo apt-get -y install mariadb-server
 }
 
 pterodactyl() {
