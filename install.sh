@@ -293,8 +293,39 @@ EOF
     sudo service nginx restart
 }
 
+apache_config {
+  output "Configuring Apache2"
+cat > /etc/apache2/sites-available/pterodactyl.conf << EOF
+
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+ServerAdmin webmaster@localhost
+DocumentRoot "/var/www/pterodactyl/public"
+AllowEncodedSlashes On
+php_value upload_max_filesize 100M
+php_value post_max_size 100M
+<Directory "/var/www/pterodactyl/public">
+AllowOverride all
+</Directory>
+
+SSLEngine on
+SSLCertificateFile /etc/letsencrypt/live/$FQDN/fullchain.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/$FQDN/privkey.pem
+ServerName $FQDN
+</VirtualHost>
+</IfModule>
+EOF
+
+echo -e "<VirtualHost *:80>\nRewriteEngine on\nRewriteCond %{SERVER_NAME} =$FQDN\nRewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,QSA,R=permanent]\n</VirtualHost>" > /etc/apache2/sites-available/000-default.conf
+
+  sudo ln -s /etc/apache2/sites-available/pterodactyl.conf /etc/apache2/sites-enabled/pterodactyl.conf
+  sudo a2enmod rewrite
+  sudo a2enmod ssl
+  service apache2 restart
+}
+
 pterodactyl_daemon() {
-    output "Installing the daemon now! Almost done!!"
+    output "Installing Pterodactyl Daemon"
     sudo apt-get update -y
     sudo apt-get upgrade -y
     curl -sSL https://get.docker.com/ | sh
