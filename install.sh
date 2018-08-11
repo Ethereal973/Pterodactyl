@@ -398,7 +398,6 @@ case $osoption in
                     ssl_certs
                     nginx_config
                     ;;
-                esac
                 2)  install_apache_dependencies
                     pterodactyl_download
                     pterodactyl_install
@@ -462,7 +461,6 @@ case $osoption in
                     ssl_certs
                     nginx_config
                     ;;
-                esac
                 2)  install_apache_dependencies
                     pterodactyl_download
                     pterodactyl_install
@@ -526,7 +524,6 @@ case $osoption in
                     ssl_certs
                     nginx_config
                     ;;
-                esac
                 2)  install_apache_dependencies
                     pterodactyl_download
                     pterodactyl_install
@@ -590,7 +587,6 @@ case $osoption in
                     ssl_certs
                     nginx_config
                     ;;
-                esac
                 2)  install_apache_dependencies
                     pterodactyl_download
                     pterodactyl_install
