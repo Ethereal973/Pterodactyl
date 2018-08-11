@@ -11,12 +11,6 @@ server_os() {
         2 ) osoption=2
             output "Ubuntu 16.04 LTS selected."
             ;;
-        3 ) osoption=3
-            output "Debian 9 selected."
-            ;;
-        4 ) option=4
-            output "Debian 8 selected."
-            ;;
         * ) output "You did not enter a a valid selection"
             server_os
     esac
@@ -109,24 +103,6 @@ server_u16() {
     sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
     sudo add-apt-repository 'deb [arch=amd64,arm64,i386,ppc64el] https://mirrors.shu.edu.cn/mariadb/repo/10.3/ubuntu xenial main'
     sudo add-apt-repository -y ppa:certbot/certbot
-}
-
-server_d9() {
-    output "Adding repositories and PPAs."
-    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-    add-apt-repository -y ppa:chris-lea/redis-server
-    sudo apt-get install software-properties-common dirmngr
-    sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xF1656F24C74CD1D8
-    sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/debian stretch main'
-}
-
-server_d8() {
-    output "Adding repositories and PPAs."
-    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-    add-apt-repository -y ppa:chris-lea/redis-server
-    sudo apt-get install software-properties-common
-    sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
-    sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.3/debian jessie main'
 }
 
 install_nginx_dependencies() {
@@ -433,14 +409,13 @@ case $osoption in
                         pterodactyl_queue_listeners
                         ssl_certs
                         apache_config
-                        ;;
-                    esac
-                    ;;
-                 required_vars_daemon
-                 ssl_certs
-                 pterodactyl_daemon_dependencies 
-                 pterodactyl_daemon
-                 wings_service
+                esac
+                ;;
+                required_vars_daemon
+                ssl_certs
+                pterodactyl_daemon_dependencies 
+                pterodactyl_daemon
+                wings_service
            ;;
 
     esac           
