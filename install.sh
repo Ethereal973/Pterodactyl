@@ -324,8 +324,8 @@ echo -e "<VirtualHost *:80>\nRewriteEngine on\nRewriteCond %{SERVER_NAME} =$FQDN
   service apache2 restart
 }
 
-pterodactyl_daemon() {
-    output "Installing Pterodactyl Daemon"
+pterodactyl_daemon_dependencies() {
+    output "Installing Pterodactyl Daemon Dependencies"
     sudo apt-get update -y
     sudo apt-get upgrade -y
     curl -sSL https://get.docker.com/ | sh
@@ -335,14 +335,20 @@ pterodactyl_daemon() {
     sudo apt-get -y install nodejs
     output "Making sure we didnt miss any dependencies "
     sudo apt-get -y install tar unzip make gcc g++ python-minimal
-    output "Ok really installing the daemon files now"
+}
+
+pterodactyl_daemon(){
+    output "Installing Pterodactyl dependencies"
     sudo mkdir -p /srv/daemon /srv/daemon-data
     cd /srv/daemon
     curl -L https://github.com/pterodactyl/daemon/releases/download/v0.6.3/daemon.tar.gz
     tar --strip-components=1 -xzv
     npm install --only=production
+}
 
+wings_service(){
 sudo bash -c 'cat > /etc/systemd/system/wings.service' <<-'EOF'
+
 [Unit]
 Description=Pterodactyl Wings Daemon
 After=docker.service
@@ -365,7 +371,7 @@ EOF
       sudo systemctl enable wings
       
 output "Installation completed. Please check the youtube video on how to configure the daemon."
-
+}
 # Process command line...
 server_setup
 initial
