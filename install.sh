@@ -49,7 +49,7 @@ webserver_options {
       2 ) webserver=2
           output "You have selected Apache."
           ;;
-      * ) output "You did not enter a a valid selection"
+      * ) output "You did not enter a valid selection"
           webserver_options
   esac
 }
@@ -147,8 +147,8 @@ install_mariadb() {
     sudo apt-get -y install mariadb-server
 }
 
-pterodactyl_download {
-    output "Downloading Pterodactyl"
+pterodactyl_download() {
+    output "Downloading Pterodactyl."
     mkdir -p /var/www/pterodactyl
     cd /var/www/pterodactyl
     curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v0.7.9/panel.tar.gz
@@ -156,42 +156,41 @@ pterodactyl_download {
     chmod -R 755 storage/* bootstrap/cache/
 }
 
-pterodactyl() {
-    output "Install Pterodactyl-Panel."
-    # Installing the Panel
-    cd /var/www/pterodactyl
-    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v0.7.9/panel.tar.gz
-    tar --strip-components=1 -xzvf panel.tar.gz
-    chmod -R 755 storage/* bootstrap/cache/
-    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-    output "Environment Setup"
-    cp .env.example .env
-    composer install --no-dev --optimize-autoloader
-    php artisan key:generate --force
-    output "Unless you are using a remote caching server, hit Enter to use the default settings for redis host, port and password."
-    php artisan p:environment:setup
-    output "Database setup"
-    password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`  
-    Q1="CREATE DATABASE IF NOT EXISTS panel;"
-    Q2="GRANT ALL ON *.* TO 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$password';"
-    Q3="FLUSH PRIVILEGES;"
-    SQL="${Q1}${Q2}${Q3}"
-    
-    sudo mysql -u root -p="" -e "$SQL"
+pterodactyl_install {
+  output "Installing Pterodactyl."
+  curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 
-    output "Database 'panel' and user 'pterodactyl' created with password $password ."
-    
-    php artisan p:environment:database 
-    output "Mail Setup"
-    php artisan p:environment:mail
-    output "Database Setup"
-    php artisan migrate --seed
-    output "Create First User"
-    php artisan p:user:make --email="$EMAIL" --password=$PANELPASS --admin=y
-     
+  cp .env.example .env
+  composer install --no-dev
+  php artisan key:generate --force
 
-   output "Creating config files"
-sudo bash -c 'cat > /etc/systemd/system/pteroq.service' <<-'EOF'
+  password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+
+  Q1="CREATE DATABASE IF NOT EXISTS pterodactyl;"
+  Q2="GRANT ALL ON pterodactyl.* TO 'panel'@'127.0.0.1' IDENTIFIED BY '$password';"
+  Q3="FLUSH PRIVILEGES;"
+  SQL="${Q1}${Q2}${Q3}"
+
+  mysql -u root -e "$SQL"
+
+  php artisan p:environment:setup
+  php artisan p:environment:database
+
+  output "To use PHP's internal mail sending, select [mail]. To use acustom SMTP server, select [smtp]."
+
+  php artisan migrate --seed
+
+  php artisan p:user:make --firstname=$firstname --lastname=$lastname --username=$username --email=$email --password=$userpassword --admin=1
+
+  chown -R www-data:www-data *
+}
+
+pterodactyl_queue_listeners {
+  output "Creating panel queue listeners"
+  (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
+
+cat > /etc/systemd/system/pteroq.service <<- "EOF"
+
 [Unit]
 Description=Pterodactyl Queue Worker
 After=redis-server.service
@@ -207,9 +206,9 @@ ExecStart=/usr/bin/php /var/www/pterodactyl/artisan queue:work --queue=high,stan
 [Install]
 WantedBy=multi-user.target
 EOF
-    output "Updating cronjob"
-    crontab -l | { cat; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1"; } | crontab -
-    sudo service cron restart
+
+  sudo systemctl enable pteroq.service
+  sudo systemctl start pteroq
 }
 
 pterodactyl_nginx() {
