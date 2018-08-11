@@ -408,7 +408,7 @@ case $osoption in
                 esac
                 ;;
           esac
-          
+          ;;
           2)    required_vars_daemon
                 ssl_certs
                 pterodactyl_daemon_dependencies
@@ -416,7 +416,7 @@ case $osoption in
                 wings_service
                 ;;
           esac
-          
+          ;;
           3)    webserver_options
                 required_vars_panel
                 initial
@@ -471,7 +471,7 @@ case $osoption in
                 esac
                 ;;
           esac
-          
+          ;;
           2)    required_vars_daemon
                 ssl_certs
                 pterodactyl_daemon_dependencies
@@ -479,7 +479,7 @@ case $osoption in
                 wings_service
                 ;;
           esac
-          
+          ;;
           3)    webserver_options
                 required_vars_panel
                 initial
@@ -509,7 +509,7 @@ case $osoption in
            esac
            ;;
     esac      
-    
+    ;;
     3) case $installoption in
         1)  webserver_options            
             required_vars_panel
@@ -534,7 +534,7 @@ case $osoption in
                 esac
                 ;;
           esac
-          
+          ;;
           2)    required_vars_daemon
                 ssl_certs
                 pterodactyl_daemon_dependencies
@@ -542,7 +542,7 @@ case $osoption in
                 wings_service
                 ;;
           esac
-          
+          ;;
           3)    webserver_options
                 required_vars_panel
                 initial
@@ -572,7 +572,7 @@ case $osoption in
            esac
            ;;
     esac    
-    
+    ;;
     4) case $installoption in
         1)  webserver_options            
             required_vars_panel
@@ -597,7 +597,7 @@ case $osoption in
                 esac
                 ;;
           esac
-          
+          ;;
           2)    required_vars_daemon
                 ssl_certs
                 pterodactyl_daemon_dependencies
@@ -605,7 +605,7 @@ case $osoption in
                 wings_service
                 ;;
           esac
-          
+          ;;
           3)    webserver_options
                 required_vars_panel
                 initial
