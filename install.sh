@@ -39,7 +39,7 @@ server_options() {
     esac
 }   
     
-webserver_options {
+webserver_options() {
   output "Please select which web server you would like to use:\n[1] Nginx (Recommended).\n[2] Apache."
   read choice
   case $choice in
