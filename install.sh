@@ -54,7 +54,7 @@ webserver_options {
   esac
 }
     
-required_vars_panel {
+required_vars_panel() {
     output "Please enter your FQDN:"
     read FQDN
 
@@ -77,7 +77,7 @@ required_vars_panel {
     read userpassword
 }
 
-required_vars_daemon {
+required_vars_daemon() {
   output "Please enter your FQDN"
   read FQDN
 }
@@ -156,7 +156,7 @@ pterodactyl_download() {
     chmod -R 755 storage/* bootstrap/cache/
 }
 
-pterodactyl_install {
+pterodactyl_install() {
   output "Installing Pterodactyl."
   curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -185,7 +185,7 @@ pterodactyl_install {
   chown -R www-data:www-data *
 }
 
-pterodactyl_queue_listeners {
+pterodactyl_queue_listeners() {
   output "Creating panel queue listeners"
   (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
 
@@ -211,78 +211,84 @@ EOF
   sudo systemctl start pteroq
 }
 
-pterodactyl_nginx() {
-    output "Creating webserver initial config file"
-
-    output "Install LetsEncrypt and setting SSL"
+ssl_certs(){
+    output "Installing LetsEncrypt and creating an SSL certificate."
     sudo service nginx stop
-    sudo certbot certonly --email "$EMAIL" --agree-tos -d "$SERVNAME"
-    echo '
-        server {
-            listen 80;
-            listen [::]:80;
-            server_name '"${SERVNAME}"';
-            return 301 https://$server_name$request_uri;
-        }
-        
-        server {
-            listen 443 ssl http2;
-            listen [::]:443 ssl http2;
-            server_name '"${SERVNAME}"';
-        
-            root /var/www/pterodactyl/public;
-            index index.php;
-        
-            access_log /var/log/nginx/pterodactyl.app-accress.log;
-            error_log  /var/log/nginx/pterodactyl.app-error.log error;
-        
-            # allow larger file uploads and longer script runtimes
-            client_max_body_size 100m;
-            client_body_timeout 120s;
-            
-            sendfile off;
-        
-            # strengthen ssl security
-            ssl_certificate /etc/letsencrypt/live/'"${SERVNAME}"'/fullchain.pem;
-            ssl_certificate_key /etc/letsencrypt/live/'"${SERVNAME}"'/privkey.pem;
-            ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-            ssl_prefer_server_ciphers on;
-            ssl_session_cache shared:SSL:10m;
-            ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:ECDHE-RSA-AES128-GCM-SHA256:AES256+EECDH:DHE-RSA-AES128-GCM-SHA256:AES256+EDH:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
-            ssl_dhparam /etc/ssl/certs/dhparam.pem;
-        
-            # Add headers to serve security related headers
-            add_header Strict-Transport-Security "max-age=15768000; preload;";
-            add_header X-Content-Type-Options nosniff;
-            add_header X-XSS-Protection "1; mode=block";
-            add_header X-Robots-Tag none;
-            add_header Content-Security-Policy "frame-ancestors 'self'";
-        
-            location / {
-                    try_files $uri $uri/ /index.php?$query_string;
-              }
-        
-            location ~ \.php$ {
-                fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
-                fastcgi_index index.php;
-                include fastcgi_params;
-                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                fastcgi_intercept_errors off;
-                fastcgi_buffer_size 16k;
-                fastcgi_buffers 4 16k;
-                fastcgi_connect_timeout 300;
-                fastcgi_send_timeout 300;
-                fastcgi_read_timeout 300;
-                include /etc/nginx/fastcgi_params;
-            }
-        
-            location ~ /\.ht {
-                deny all;
-            }
-        }
-    ' | sudo -E tee /etc/nginx/sites-available/pterodactyl.conf >/dev/null 2>&1    
+    sudo certbot certonly --email "$email" --agree-tos -d "$FQDN"
+}
+
+nginx_config() {
+    output "Configuring Nginx Webserver"
+    cat > /etc/nginx/sites-available/pterodactyl.conf << EOF
     
+server_tokens off;
+
+server {
+    listen 80;
+    server_name $FQDN;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name $FQDN;
+
+    root /var/www/pterodactyl/public;
+    index index.php;
+
+    access_log /var/log/nginx/pterodactyl.app-access.log;
+    error_log  /var/log/nginx/pterodactyl.app-error.log error;
+
+    # allow larger file uploads and longer script runtimes
+    client_max_body_size 100m;
+    client_body_timeout 120s;
+
+    sendfile off;
+
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/$FQDN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$FQDN/privkey.pem;
+    ssl_session_cache shared:SSL:10m;
+    ssl_protocols TLSv1.2;
+    ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+    ssl_prefer_server_ciphers on;
+
+    # See https://hstspreload.org/ before uncommenting the line below.
+    # add_header Strict-Transport-Security "max-age=15768000; preload;";
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Robots-Tag none;
+    add_header Content-Security-Policy "frame-ancestors 'self'";
+    add_header X-Frame-Options DENY;
+    add_header Referrer-Policy same-origin;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param PHP_VALUE "upload_max_filesize = 100M \n post_max_size=100M";
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTP_PROXY "";
+        fastcgi_intercept_errors off;
+        fastcgi_buffer_size 16k;
+        fastcgi_buffers 4 16k;
+        fastcgi_connect_timeout 300;
+        fastcgi_send_timeout 300;
+        fastcgi_read_timeout 300;
+        include /etc/nginx/fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}   
+EOF
+
     sudo ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/pterodactyl.conf
     sudo service nginx restart
 }
