@@ -402,6 +402,10 @@ case $osoption in
                         pterodactyl_queue_listeners
                         ssl_certs
                         nginx_config
+                        required_vars_daemon
+                        pterodactyl_daemon_dependencies 
+                        pterodactyl_daemon
+                        wings_service
                         ;;
                     2)  install_apache_dependencies
                         pterodactyl_download
@@ -409,13 +413,11 @@ case $osoption in
                         pterodactyl_queue_listeners
                         ssl_certs
                         apache_config
+                        pterodactyl_daemon_dependencies 
+                        pterodactyl_daemon
+                        wings_service
+                        ;;
                 esac
-                ;;
-                required_vars_daemon
-                ssl_certs
-                pterodactyl_daemon_dependencies 
-                pterodactyl_daemon
-                wings_service
            ;;
 
     esac           
