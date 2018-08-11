@@ -293,7 +293,7 @@ EOF
     sudo service nginx restart
 }
 
-apache_config {
+apache_config() {
   output "Configuring Apache2"
 cat > /etc/apache2/sites-available/pterodactyl.conf << EOF
 
@@ -374,4 +374,25 @@ output "Installation completed. Please check the youtube video on how to configu
 }
 
 
-case $osoption
+#Execution
+server_os
+server_options
+
+case $osoption in
+    1) case $installoption in
+        1)  webserver_options            
+            required_vars_panel
+            initial
+            server_u18
+            install_mariadb
+            case $webserver in
+                1)  install_nginx_dependencies
+                    pterodactyl_download
+                    pterodactyl_install
+                    pterodactyl_queue_listeners
+                    ssl_certs
+                    nginx_config
+                    ;;
+                esac
+                
+                    
